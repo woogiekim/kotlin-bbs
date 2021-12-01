@@ -8,16 +8,17 @@ import javax.persistence.*
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
-abstract class BaseEntity {
+abstract class BaseEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected val id: Long? = null
+    protected val id: Long? = null,
 
     @CreatedDate
-    protected lateinit var createAt: LocalDateTime
+    protected var createAt: LocalDateTime? = null,
 
     @LastModifiedDate
-    protected lateinit var updateAt: LocalDateTime
+    protected var updateAt: LocalDateTime? = null
+) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
