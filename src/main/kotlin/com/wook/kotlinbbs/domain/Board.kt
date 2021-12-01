@@ -4,7 +4,7 @@ import javax.persistence.Entity
 
 @Entity
 class Board(
-    private var author: String,
-    private var title: String,
-    private var content: String
+    var author: String,
+    var title: String,
+    var content: String
 ) : BaseEntity()
