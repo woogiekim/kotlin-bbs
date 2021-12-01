@@ -11,13 +11,13 @@ import javax.persistence.*
 abstract class BaseEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected val id: Long? = null,
+    val id: Long? = null,
 
     @CreatedDate
-    protected var createAt: LocalDateTime? = null,
+    var createAt: LocalDateTime? = null,
 
     @LastModifiedDate
-    protected var updateAt: LocalDateTime? = null
+    var updateAt: LocalDateTime? = null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

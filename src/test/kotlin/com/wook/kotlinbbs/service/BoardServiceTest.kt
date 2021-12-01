@@ -13,13 +13,12 @@ import org.mockito.junit.jupiter.MockitoExtension
 @ExtendWith(MockitoExtension::class)
 class BoardServiceTest {
 
+    private val mockBoardRepository = mock(BoardRepository::class.java)
+    private val boardService = BoardService(mockBoardRepository)
+
     @DisplayName("게시물 등록")
     @Test
     fun addBoard() {
-        //given
-        val mockBoardRepository = mock(BoardRepository::class.java)
-        val boardService = BoardService(mockBoardRepository)
-
         val board = Board(id = 1L, author = "김태욱", title = "제목 테스트", content = "내용 테스트")
         `when`(mockBoardRepository.save(board)).thenReturn(board)
 
