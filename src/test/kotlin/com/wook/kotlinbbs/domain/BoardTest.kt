@@ -24,20 +24,26 @@ class BoardTest {
 
     @Test
     fun `작성자, 제목, 내용이 없으면 예외가 발생한다`() {
+        //given
+        val author = "김태욱"
+        val title = "제목 테스트"
+        val content = "내용 테스트"
+        val blankValue = " "
+
         assertAll(
             {
                 assertThatIllegalArgumentException()
-                    .isThrownBy { Board(id = 1L, author = " ", title = "제목 테스트", content = "내용 테스트") }
+                    .isThrownBy { Board(author = blankValue, title = title, content = content) }
                     .withMessageContaining("작성자")
             },
             {
                 assertThatIllegalArgumentException()
-                    .isThrownBy { Board(id = 1L, author = "김태욱", title = " ", content = "내용 테스트") }
+                    .isThrownBy { Board(author = author, title = blankValue, content = content) }
                     .withMessageContaining("제목")
             },
             {
                 assertThatIllegalArgumentException()
-                    .isThrownBy { Board(id = 1L, author = "김태욱", title = "제목 테스트", content = " ") }
+                    .isThrownBy { Board(author = author, title = title, content = blankValue) }
                     .withMessageContaining("내용")
             }
         )
