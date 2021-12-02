@@ -3,6 +3,7 @@ package com.wook.kotlinbbs.service
 import com.wook.kotlinbbs.domain.Board
 import com.wook.kotlinbbs.repository.BoardRepository
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatIllegalStateException
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -11,6 +12,7 @@ import org.mockito.Mockito.*
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
+import java.util.*
 import java.util.stream.LongStream
 import kotlin.streams.toList
 
@@ -51,5 +53,32 @@ class BoardServiceTest {
 
         //then
         assertThat(boards).isNotEmpty.isEqualTo(givenBoards)
+    }
+
+    @DisplayName("게시물 조회")
+    @Test
+    fun getBoard() {
+        //given
+        val id = 1L
+        val givenBoard = Board(id = id, author = "김태욱", title = "제목 테스트", content = "내용 테스트")
+        `when`(mockBoardRepository.findById(id)).thenReturn(Optional.of(givenBoard))
+
+        //when
+        val actualBoard = boardService.getBoard(1L)
+
+        //then
+        assertThat(actualBoard).isNotNull.isEqualTo(givenBoard)
+    }
+
+    @DisplayName("게시물을 찾을 수 없음")
+    @Test
+    fun notFoundBoard() {
+        //given
+        val id = 1L
+        val givenBoard = Board(id = id, author = "김태욱", title = "제목 테스트", content = "내용 테스트")
+        `when`(mockBoardRepository.findById(id)).thenReturn(Optional.of(givenBoard))
+
+        //when then
+        assertThatIllegalStateException().isThrownBy { boardService.getBoard(2L) }
     }
 }

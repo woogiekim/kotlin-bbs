@@ -17,4 +17,8 @@ class BoardService(private val boardRepository: BoardRepository) {
     fun getBoards(pageable: Pageable): List<Board> {
         return boardRepository.findAll(pageable).content
     }
+
+    fun getBoard(id: Long): Board {
+        return boardRepository.findById(id).orElseThrow { IllegalStateException("삭제되었거나 없는 게시글입니다.") }
+    }
 }

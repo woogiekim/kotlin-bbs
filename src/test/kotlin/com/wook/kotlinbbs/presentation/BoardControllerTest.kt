@@ -119,4 +119,37 @@ class BoardControllerTest @Autowired constructor(
             perform(get("/boards")).andExpect(status().isOk)
         }
     }
+
+    @DisplayName("게시물 조회")
+    @Test
+    fun getBoard() {
+        //given
+        //게시물 등록 되어 있음
+        val boardResponse = `게시물 등록 및 검증`(BoardRequest(author = "wook", title = "title", content = "content"))
+
+        //when
+        val resultActions = `게시물 조회`(boardResponse.id)
+
+        //then
+        `게시물 조회됨`(boardResponse, resultActions)
+    }
+
+    fun `게시물 조회`(id: Long): ResultActions {
+        return mockMvc.run {
+            perform(get("/boards/{id}", id)).andExpect(status().isOk)
+        }
+    }
+
+    fun `게시물 조회됨`(boardResponse: BoardResponse, resultActions: ResultActions) {
+        resultActions.apply {
+            andExpectAll(
+                { jsonPath("$.id", { it.equals(boardResponse.id) }) },
+                { jsonPath("$.author", { it.equals(boardResponse.author) }) },
+                { jsonPath("$.title", { it.equals(boardResponse.title) }) },
+                { jsonPath("$.content", { it.equals(boardResponse.content) }) },
+                { jsonPath("$.createAt", { it.equals(boardResponse.createAt) }) },
+                { jsonPath("$.updateAt", { it.equals(boardResponse.updateAt) }) }
+            )
+        }
+    }
 }

@@ -13,7 +13,7 @@ data class BoardRequest(
 }
 
 data class BoardResponse(
-    val id: Long?,
+    val id: Long,
     val author: String,
     val title: String,
     val content: String,
@@ -25,7 +25,7 @@ data class BoardResponse(
         fun fromEntity(board: Board): BoardResponse {
             return board.run {
                 BoardResponse(
-                    id = id,
+                    id = id!!,
                     author = author,
                     title = title,
                     content = content,
