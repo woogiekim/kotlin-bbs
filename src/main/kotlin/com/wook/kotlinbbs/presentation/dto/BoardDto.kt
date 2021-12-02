@@ -1,6 +1,6 @@
 package com.wook.kotlinbbs.presentation.dto
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.wook.kotlinbbs.domain.Board
 
 data class BoardRequest(
@@ -13,7 +13,7 @@ data class BoardRequest(
     }
 
     fun toJson(): String {
-        return ObjectMapper().writeValueAsString(this)
+        return jacksonObjectMapper().writeValueAsString(this)
     }
 }
 
