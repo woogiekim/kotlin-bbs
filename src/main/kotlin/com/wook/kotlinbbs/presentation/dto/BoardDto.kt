@@ -1,6 +1,5 @@
 package com.wook.kotlinbbs.presentation.dto
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.wook.kotlinbbs.domain.Board
 
 data class BoardRequest(
@@ -10,10 +9,6 @@ data class BoardRequest(
 ) {
     fun toEntity(): Board {
         return Board(author = author, title = title, content = content)
-    }
-
-    fun toJson(): String {
-        return jacksonObjectMapper().writeValueAsString(this)
     }
 }
 

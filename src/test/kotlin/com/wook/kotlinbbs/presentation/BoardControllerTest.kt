@@ -45,7 +45,7 @@ class BoardControllerTest @Autowired constructor(
             perform(
                 post("/boards")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(boardRequest.toJson())
+                    .content(jacksonObjectMapper().writeValueAsString(boardRequest))
             )
                 .andExpect(status().isCreated)
                 .andExpect(header().exists("location"))
