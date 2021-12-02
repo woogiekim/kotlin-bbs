@@ -41,3 +41,15 @@ data class BoardResponse(
         }
     }
 }
+
+data class BoardResponses(
+    val boardResponses: List<BoardResponse>
+) {
+    companion object {
+        fun fromEntity(boards: List<Board>): BoardResponses {
+            return boards.run {
+                BoardResponses(map { BoardResponse.fromEntity(it) }.toList())
+            }
+        }
+    }
+}
