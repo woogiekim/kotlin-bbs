@@ -31,7 +31,7 @@ class BoardControllerTest @Autowired constructor(
         val author = "김태욱"
         val title = "제목 테스트"
         val content = "내용 테스트"
-        val boardRequest = BoardRequest(author = author, title = title, content = content)
+        val boardRequest = BoardRequest(author, title, content)
 
         //when
         val resultActions = `게시물 등록`(boardRequest)
@@ -41,32 +41,24 @@ class BoardControllerTest @Autowired constructor(
     }
 
     fun `게시물 등록`(boardRequest: BoardRequest): ResultActions {
-        return mockMvc.run {
-            perform(
-                post("/boards")
-                    .contentType(MediaType.APPLICATION_JSON)
+        return mockMvc
+            .perform(
+                post("/boards").contentType(MediaType.APPLICATION_JSON)
                     .content(jacksonObjectMapper().writeValueAsString(boardRequest))
             )
-                .andExpect(status().isCreated)
-                .andExpect(header().exists("location"))
-        }
+            .andExpect(status().isCreated).andExpect(header().exists("location"))
     }
 
     fun `게시물 등록됨`(
-        resultActions: ResultActions,
-        author: String,
-        title: String,
-        content: String
+        resultActions: ResultActions, author: String, title: String, content: String
     ) {
         resultActions.apply {
-            andExpectAll(
-                { jsonPath("$.id").exists() },
+            andExpectAll({ jsonPath("$.id").exists() },
                 { jsonPath("$.author", { it.equals(author) }) },
                 { jsonPath("$.title", { it.equals(title) }) },
                 { jsonPath("$.content", { it.equals(content) }) },
                 { jsonPath("$.createAt").exists() },
-                { jsonPath("$.updateAt").exists() }
-            )
+                { jsonPath("$.updateAt").exists() })
         }
     }
 
@@ -93,7 +85,7 @@ class BoardControllerTest @Autowired constructor(
         //given
         //게시물 등록 되어 있음
         for (index in 1..10) {
-            `게시물 등록 및 검증`(BoardRequest(author = "wook $index", title = "title $index", content = "content $index"))
+            `게시물 등록 및 검증`(BoardRequest("wook $index", "title $index", "content $index"))
         }
 
         val resultActions = `게시물 목록 조회`()
@@ -102,16 +94,14 @@ class BoardControllerTest @Autowired constructor(
     }
 
     private fun `게시물 목록 조회됨`(resultActions: ResultActions) {
-        resultActions.apply {
-            andExpectAll(
-                { jsonPath("$.boardResponses.*.id").exists() },
-                { jsonPath("$.boardResponses.*.author").exists() },
-                { jsonPath("$.boardResponses.*.title").exists() },
-                { jsonPath("$.boardResponses.*.content").exists() },
-                { jsonPath("$.boardResponses.*.createAt").exists() },
-                { jsonPath("$.boardResponses.*.updateAt").exists() }
-            )
-        }
+        resultActions.andExpectAll(
+            { jsonPath("$.boardResponses.*.id").exists() },
+            { jsonPath("$.boardResponses.*.author").exists() },
+            { jsonPath("$.boardResponses.*.title").exists() },
+            { jsonPath("$.boardResponses.*.content").exists() },
+            { jsonPath("$.boardResponses.*.createAt").exists() },
+            { jsonPath("$.boardResponses.*.updateAt").exists() }
+        )
     }
 
     fun `게시물 목록 조회`(): ResultActions {
@@ -125,7 +115,7 @@ class BoardControllerTest @Autowired constructor(
     fun getBoard() {
         //given
         //게시물 등록 되어 있음
-        val boardResponse = `게시물 등록 및 검증`(BoardRequest(author = "wook", title = "title", content = "content"))
+        val boardResponse = `게시물 등록 및 검증`(BoardRequest("wook", "title", "content"))
 
         //when
         val resultActions = `게시물 조회`(boardResponse.id)
@@ -135,21 +125,17 @@ class BoardControllerTest @Autowired constructor(
     }
 
     fun `게시물 조회`(id: Long): ResultActions {
-        return mockMvc.run {
-            perform(get("/boards/{id}", id)).andExpect(status().isOk)
-        }
+        return mockMvc.perform(get("/boards/{id}", id)).andExpect(status().isOk)
     }
 
     fun `게시물 조회됨`(boardResponse: BoardResponse, resultActions: ResultActions) {
-        resultActions.apply {
-            andExpectAll(
-                { jsonPath("$.id", { it.equals(boardResponse.id) }) },
-                { jsonPath("$.author", { it.equals(boardResponse.author) }) },
-                { jsonPath("$.title", { it.equals(boardResponse.title) }) },
-                { jsonPath("$.content", { it.equals(boardResponse.content) }) },
-                { jsonPath("$.createAt", { it.equals(boardResponse.createAt) }) },
-                { jsonPath("$.updateAt", { it.equals(boardResponse.updateAt) }) }
-            )
-        }
+        resultActions.andExpectAll(
+            { jsonPath("$.id", { it.equals(boardResponse.id) }) },
+            { jsonPath("$.author", { it.equals(boardResponse.author) }) },
+            { jsonPath("$.title", { it.equals(boardResponse.title) }) },
+            { jsonPath("$.content", { it.equals(boardResponse.content) }) },
+            { jsonPath("$.createAt", { it.equals(boardResponse.createAt) }) },
+            { jsonPath("$.updateAt", { it.equals(boardResponse.updateAt) }) }
+        )
     }
 }
