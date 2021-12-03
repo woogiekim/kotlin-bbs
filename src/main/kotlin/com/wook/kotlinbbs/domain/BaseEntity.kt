@@ -11,7 +11,7 @@ import javax.persistence.*
 abstract class BaseEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    var id: Long? = null,
 
     @CreatedDate
     var createAt: LocalDateTime? = null,

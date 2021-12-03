@@ -16,10 +16,10 @@ class BoardTest {
         val content = "내용 테스트"
 
         //when
-        val board = Board(id = id, author = author, title = title, content = content)
+        val board = Board(author, title, content).apply { this.id = id }
 
         //then
-        assertThat(board).isEqualTo(Board(id = id, author = author, title = title, content = content))
+        assertThat(board).isEqualTo(Board(author, title, content).apply { this.id = id })
     }
 
     @Test

@@ -27,7 +27,7 @@ class BoardServiceTest {
     @Test
     fun addBoard() {
         //given
-        val board = Board(id = 1L, author = "김태욱", title = "제목 테스트", content = "내용 테스트")
+        val board = Board("김태욱", "제목 테스트", "내용 테스트").apply { this.id = 1L }
         `when`(mockBoardRepository.save(board)).thenReturn(board)
 
         //when
@@ -44,7 +44,7 @@ class BoardServiceTest {
         //given
         val pageRequest = PageRequest.of(1, 10)
         val givenBoards = LongStream.range(1, 10)
-            .mapToObj { Board(id = it, author = "김태욱 $it", title = "제목 테스트 $it", content = "내용 테스트 $it") }
+            .mapToObj { Board("김태욱 $it", title = "제목 테스트 $it", content = "내용 테스트 $it").apply { this.id = it } }
             .toList()
         `when`(mockBoardRepository.findAll(pageRequest)).thenReturn(PageImpl(givenBoards))
 
@@ -60,7 +60,7 @@ class BoardServiceTest {
     fun getBoard() {
         //given
         val id = 1L
-        val givenBoard = Board(id = id, author = "김태욱", title = "제목 테스트", content = "내용 테스트")
+        val givenBoard = Board("김태욱", "제목 테스트", "내용 테스트").apply { this.id = id }
         `when`(mockBoardRepository.findById(id)).thenReturn(Optional.of(givenBoard))
 
         //when
@@ -75,7 +75,7 @@ class BoardServiceTest {
     fun notFoundBoard() {
         //given
         val id = 1L
-        val givenBoard = Board(id = id, author = "김태욱", title = "제목 테스트", content = "내용 테스트")
+        val givenBoard = Board("김태욱", "제목 테스트", "내용 테스트").apply { this.id = id }
         `when`(mockBoardRepository.findById(id)).thenReturn(Optional.of(givenBoard))
 
         //when then
