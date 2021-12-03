@@ -15,22 +15,18 @@ class BoardController(private val boardService: BoardService) {
 
     @PostMapping
     fun addBoard(@RequestBody boardRequest: BoardRequest): ResponseEntity<BoardResponse> {
-        return BoardResponse.fromEntity(boardService.addBoard(boardRequest.toEntity())).run {
-            ResponseEntity.created(URI.create("/boards/$id")).body(this)
-        }
+        val boardResponse = BoardResponse.fromEntity(boardService.addBoard(boardRequest.toEntity()))
+
+        return ResponseEntity.created(URI.create("/boards/${boardResponse.id}")).body(boardResponse)
     }
 
     @GetMapping
-    fun getBoards(pageable: Pageable): ResponseEntity<BoardResponses> {
-        return BoardResponses.fromEntity(boardService.getBoards(pageable)).run {
-            ResponseEntity.ok(this)
-        }
+    fun getBoards(pageable: Pageable): BoardResponses {
+        return BoardResponses.fromEntity(boardService.getBoards(pageable))
     }
 
     @GetMapping("/{id}")
-    fun getBoard(@PathVariable id: Long): ResponseEntity<BoardResponse> {
-        return BoardResponse.fromEntity(boardService.getBoard(id)).run {
-            ResponseEntity.ok(this)
-        }
+    fun getBoard(@PathVariable id: Long): BoardResponse {
+        return BoardResponse.fromEntity(boardService.getBoard(id))
     }
 }
