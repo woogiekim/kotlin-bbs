@@ -20,6 +20,7 @@ class BoardService(private val boardRepository: BoardRepository) {
     }
 
     fun getBoard(id: Long): Board {
-        return boardRepository.findByIdOrNull(id) ?: throw IllegalStateException("삭제되었거나 없는 게시글입니다.")
+        val board = boardRepository.findByIdOrNull(id) ?: throw IllegalStateException("삭제되었거나 없는 게시글입니다.")
+        return board
     }
 }

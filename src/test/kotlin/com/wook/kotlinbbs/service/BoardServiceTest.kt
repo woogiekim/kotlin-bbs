@@ -2,40 +2,44 @@ package com.wook.kotlinbbs.service
 
 import com.wook.kotlinbbs.domain.Board
 import com.wook.kotlinbbs.repository.BoardRepository
+import io.mockk.every
+import io.mockk.impl.annotations.InjectMockKs
+import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
+import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatIllegalStateException
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.BDDMockito.`when`
-import org.mockito.Mockito.*
-import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import java.util.*
+import org.springframework.data.repository.findByIdOrNull
 import java.util.stream.LongStream
 import kotlin.streams.toList
 
 @DisplayName("게시판 서비스 테스트")
-@ExtendWith(MockitoExtension::class)
+@ExtendWith(MockKExtension::class)
 class BoardServiceTest {
+    @MockK
+    private lateinit var mockBoardRepository: BoardRepository
 
-    val mockBoardRepository = mock(BoardRepository::class.java)
-    val boardService = BoardService(mockBoardRepository)
+    @InjectMockKs
+    private lateinit var boardService: BoardService
 
     @DisplayName("게시물 등록")
     @Test
     fun addBoard() {
         //given
         val board = Board("김태욱", "제목 테스트", "내용 테스트").apply { this.id = 1L }
-        `when`(mockBoardRepository.save(board)).thenReturn(board)
+        every { mockBoardRepository.save(board) } returns board
 
         //when
         val actualBoard = boardService.addBoard(board)
 
         //then
         assertThat(actualBoard).isEqualTo(board)
-        verify(mockBoardRepository, times(1)).save(board)
+        verify { mockBoardRepository.save(board) }
     }
 
     @DisplayName("게시물 목록 조회")
@@ -44,15 +48,16 @@ class BoardServiceTest {
         //given
         val pageRequest = PageRequest.of(1, 10)
         val givenBoards = LongStream.range(1, 10)
-            .mapToObj { Board("김태욱 $it", title = "제목 테스트 $it", content = "내용 테스트 $it").apply { this.id = it } }
+            .mapToObj { Board("김태욱 $it", "제목 테스트 $it", "내용 테스트 $it").apply { this.id = it } }
             .toList()
-        `when`(mockBoardRepository.findAll(pageRequest)).thenReturn(PageImpl(givenBoards))
+        every { mockBoardRepository.findAll(pageRequest) } returns PageImpl(givenBoards)
 
         //when
         val boards = boardService.getBoards(pageRequest)
 
         //then
         assertThat(boards).isNotEmpty.isEqualTo(givenBoards)
+        verify { mockBoardRepository.findAll(pageRequest) }
     }
 
     @DisplayName("게시물 조회")
@@ -61,13 +66,14 @@ class BoardServiceTest {
         //given
         val id = 1L
         val givenBoard = Board("김태욱", "제목 테스트", "내용 테스트").apply { this.id = id }
-        `when`(mockBoardRepository.findById(id)).thenReturn(Optional.of(givenBoard))
+        every { mockBoardRepository.findByIdOrNull(id) } returns givenBoard
 
         //when
-        val actualBoard = boardService.getBoard(1L)
+        val actualBoard = boardService.getBoard(id)
 
         //then
         assertThat(actualBoard).isNotNull.isEqualTo(givenBoard)
+        verify { mockBoardRepository.findByIdOrNull(id) }
     }
 
     @DisplayName("게시물을 찾을 수 없음")
@@ -75,10 +81,10 @@ class BoardServiceTest {
     fun notFoundBoard() {
         //given
         val id = 1L
-        val givenBoard = Board("김태욱", "제목 테스트", "내용 테스트").apply { this.id = id }
-        `when`(mockBoardRepository.findById(id)).thenReturn(Optional.of(givenBoard))
+        every { mockBoardRepository.findByIdOrNull(id) } returns null
 
         //when then
-        assertThatIllegalStateException().isThrownBy { boardService.getBoard(2L) }
+        assertThatIllegalStateException().isThrownBy { boardService.getBoard(id) }
+        verify { mockBoardRepository.findByIdOrNull(id) }
     }
 }
