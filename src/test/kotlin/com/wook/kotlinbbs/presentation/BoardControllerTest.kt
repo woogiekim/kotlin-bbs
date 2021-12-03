@@ -46,20 +46,23 @@ class BoardControllerTest @Autowired constructor(
                 post("/boards").contentType(MediaType.APPLICATION_JSON)
                     .content(jacksonObjectMapper().writeValueAsString(boardRequest))
             )
-            .andExpect(status().isCreated).andExpect(header().exists("location"))
+            .andExpectAll(
+                { status().isCreated },
+                { header().exists("location") }
+            )
     }
 
     fun `게시물 등록됨`(
         resultActions: ResultActions, author: String, title: String, content: String
     ) {
-        resultActions.apply {
-            andExpectAll({ jsonPath("$.id").exists() },
-                { jsonPath("$.author", { it.equals(author) }) },
-                { jsonPath("$.title", { it.equals(title) }) },
-                { jsonPath("$.content", { it.equals(content) }) },
-                { jsonPath("$.createAt").exists() },
-                { jsonPath("$.updateAt").exists() })
-        }
+        resultActions.andExpectAll(
+            { jsonPath("$.id").exists() },
+            { jsonPath("$.author", { it.equals(author) }) },
+            { jsonPath("$.title", { it.equals(title) }) },
+            { jsonPath("$.content", { it.equals(content) }) },
+            { jsonPath("$.createAt").exists() },
+            { jsonPath("$.updateAt").exists() }
+        )
     }
 
     fun `게시물 등록 및 검증`(boardRequest: BoardRequest): BoardResponse {
