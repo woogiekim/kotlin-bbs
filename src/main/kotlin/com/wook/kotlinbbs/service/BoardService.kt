@@ -3,6 +3,7 @@ package com.wook.kotlinbbs.service
 import com.wook.kotlinbbs.domain.Board
 import com.wook.kotlinbbs.repository.BoardRepository
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
@@ -19,6 +20,6 @@ class BoardService(private val boardRepository: BoardRepository) {
     }
 
     fun getBoard(id: Long): Board {
-        return boardRepository.findById(id).orElseThrow { IllegalStateException("삭제되었거나 없는 게시글입니다.") }
+        return boardRepository.findByIdOrNull(id) ?: throw IllegalStateException("삭제되었거나 없는 게시글입니다.")
     }
 }
