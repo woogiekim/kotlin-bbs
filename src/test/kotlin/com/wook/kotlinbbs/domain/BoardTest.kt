@@ -3,7 +3,6 @@ package com.wook.kotlinbbs.domain
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertAll
 
 class BoardTest {
 
@@ -23,29 +22,23 @@ class BoardTest {
     }
 
     @Test
-    fun `작성자, 제목, 내용이 없으면 예외가 발생한다`() {
-        //given
-        val author = "김태욱"
-        val title = "제목 테스트"
-        val content = "내용 테스트"
-        val blankValue = " "
+    fun `작성자가 없으면 예외가 발생한다`() {
+        assertThatIllegalArgumentException()
+            .isThrownBy { Board(" ", "제목", "내용") }
+            .withMessageContaining("작성자")
+    }
 
-        assertAll(
-            {
-                assertThatIllegalArgumentException()
-                    .isThrownBy { Board(author = blankValue, title = title, content = content) }
-                    .withMessageContaining("작성자")
-            },
-            {
-                assertThatIllegalArgumentException()
-                    .isThrownBy { Board(author = author, title = blankValue, content = content) }
-                    .withMessageContaining("제목")
-            },
-            {
-                assertThatIllegalArgumentException()
-                    .isThrownBy { Board(author = author, title = title, content = blankValue) }
-                    .withMessageContaining("내용")
-            }
-        )
+    @Test
+    fun `제목이 없으면 예외가 발생한다`() {
+        assertThatIllegalArgumentException()
+            .isThrownBy { Board("김태욱", " ", "내용") }
+            .withMessageContaining("제목")
+    }
+
+    @Test
+    fun `내용이 없으면 예외가 발생한다`() {
+        assertThatIllegalArgumentException()
+            .isThrownBy { Board("김태욱", "제목", " ") }
+            .withMessageContaining("내용")
     }
 }
