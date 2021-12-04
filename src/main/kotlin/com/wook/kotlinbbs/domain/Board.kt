@@ -28,10 +28,7 @@ class Board private constructor(
     }
 
     fun change(board: Board): Board {
-        return this.apply {
-            requireTitle(board.title)
-            requireContent(board.content)
-
+        return apply {
             this.title = board.title
             this.content = board.content
         }
