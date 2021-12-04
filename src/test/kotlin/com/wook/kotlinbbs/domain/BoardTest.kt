@@ -22,21 +22,21 @@ class BoardTest {
     }
 
     @Test
-    fun `when author is blank then throw IllegalArgumentException`() {
+    fun `given blank author when create board then throw IllegalArgumentException`() {
         assertThatIllegalArgumentException()
             .isThrownBy { Board.createOf(" ", "제목", "내용") }
             .withMessageContaining("작성자")
     }
 
     @Test
-    fun `when title is blank then throw IllegalArgumentException`() {
+    fun `given blank title when create board then throw IllegalArgumentException`() {
         assertThatIllegalArgumentException()
             .isThrownBy { Board.createOf("김태욱", " ", "내용") }
             .withMessageContaining("제목")
     }
 
     @Test
-    fun `when content is blank then throw IllegalArgumentException`() {
+    fun `given content author when create board then throw IllegalArgumentException`() {
         assertThatIllegalArgumentException()
             .isThrownBy { Board.createOf("김태욱", "제목", " ") }
             .withMessageContaining("내용")
