@@ -45,9 +45,18 @@ class BoardController(
     }
 
     @PostMapping("/{id}/comments")
-    fun addComment(@PathVariable id: Long, @RequestBody commentCreateRequest: CommentCreateRequest): CommentResponse {
-        return CommentResponse.fromEntity(
+    fun addComment(
+        @PathVariable id: Long,
+        @RequestBody commentCreateRequest: CommentCreateRequest
+    ): ResponseEntity<CommentResponse> {
+        val commentResponse = CommentResponse.fromEntity(
             commentService.addComment(commentCreateRequest.toEntityWith(boardService.getBoard(id)))
         )
+        return ResponseEntity.created(URI.create("/boards/$id/comments")).body(commentResponse)
+    }
+
+    @GetMapping("/{id}/comments")
+    fun getComments(@PathVariable id: Long): CommentResponses {
+        return CommentResponses.fromEntity(commentService.getComments(id))
     }
 }

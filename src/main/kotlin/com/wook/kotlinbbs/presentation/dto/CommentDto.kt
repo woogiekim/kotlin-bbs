@@ -1,6 +1,7 @@
 package com.wook.kotlinbbs.presentation.dto
 
-import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer
 import com.wook.kotlinbbs.domain.Board
 import com.wook.kotlinbbs.domain.Comment
 import java.time.LocalDateTime
@@ -18,12 +19,11 @@ data class CommentResponse(
     val id: Long,
     val author: String,
     val content: String,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     val createAt: LocalDateTime?,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonDeserialize(using = LocalDateTimeDeserializer::class)
     val updateAt: LocalDateTime?
 ) {
-
     companion object {
         fun fromEntity(comment: Comment): CommentResponse {
             return comment.run {
@@ -34,6 +34,18 @@ data class CommentResponse(
                     createAt,
                     updateAt
                 )
+            }
+        }
+    }
+}
+
+data class CommentResponses(
+    val commentResponses: List<CommentResponse>
+) {
+    companion object {
+        fun fromEntity(comments: List<Comment>): CommentResponses {
+            return comments.run {
+                CommentResponses(map { CommentResponse.fromEntity(it) })
             }
         }
     }

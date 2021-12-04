@@ -12,6 +12,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.util.stream.LongStream
+import kotlin.streams.toList
 
 @DisplayName("댓글 서비스 테스트")
 @ExtendWith(MockKExtension::class)
@@ -37,5 +39,23 @@ class CommentServiceTest {
         //then
         assertThat(addComment).isNotNull.isEqualTo(comment)
         verify { mockCommentRepository.save(comment) }
+    }
+
+    @DisplayName("댓글 목록 조회")
+    @Test
+    fun getComments() {
+        //given
+        val board = Board.createOf("김태욱", "제목", "내용").apply { this.id = 1L }
+        val comments = LongStream.range(1, 10)
+            .mapToObj { Comment.createOf("김태욱", "내용", board).apply { this.id = it } }
+            .toList()
+        every { board.id?.let { mockCommentRepository.findAllByBoardId(it) } } returns comments
+
+        //when
+        val findAllComments = board.id?.let { commentService.getComments(it) }
+
+        //then
+        assertThat(findAllComments).isNotEmpty.isEqualTo(comments)
+        verify { board.id?.let { mockCommentRepository.findAllByBoardId(it) } }
     }
 }

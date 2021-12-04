@@ -1,7 +1,6 @@
 package com.wook.kotlinbbs.service
 
 import com.wook.kotlinbbs.domain.Board
-import com.wook.kotlinbbs.extension.findByIdAndDeletedIsFalseOrNull
 import com.wook.kotlinbbs.presentation.dto.BoardUpdateRequest
 import com.wook.kotlinbbs.repository.BoardRepository
 import io.mockk.every
@@ -66,14 +65,14 @@ class BoardServiceTest {
         //given
         val id = 1L
         val givenBoard = Board.createOf("김태욱", "제목 테스트", "내용 테스트").apply { this.id = id }
-        every { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) } returns givenBoard
+        every { mockBoardRepository.findByIdAndDeletedIsFalse(id) } returns givenBoard
 
         //when
         val actualBoard = boardService.getBoard(id)
 
         //then
         assertThat(actualBoard).isNotNull.isEqualTo(givenBoard)
-        verify { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) }
+        verify { mockBoardRepository.findByIdAndDeletedIsFalse(id) }
     }
 
     @DisplayName("게시물을 찾을 수 없음")
@@ -81,12 +80,12 @@ class BoardServiceTest {
     fun notFoundBoard() {
         //given
         val id = 1L
-        every { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) } returns null
+        every { mockBoardRepository.findByIdAndDeletedIsFalse(id) } returns null
 
         //when then
         assertThatIllegalStateException().isThrownBy {
             boardService.getBoard(id)
-            verify { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) }
+            verify { mockBoardRepository.findByIdAndDeletedIsFalse(id) }
         }
     }
 
@@ -96,7 +95,7 @@ class BoardServiceTest {
         //given
         val id = 1L
         val findBoard = Board.createOf("김태욱", "제목 테스트", "내용 테스트").apply { this.id = id }
-        every { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) } returns findBoard
+        every { mockBoardRepository.findByIdAndDeletedIsFalse(id) } returns findBoard
 
         val givenBoard = BoardUpdateRequest("제목 수정", "내용 수정").toEntity()
 
@@ -115,12 +114,12 @@ class BoardServiceTest {
         //given
         val id = 1L
         val findBoard = Board.createOf("김태욱", "제목 테스트", "내용 테스트").apply { this.id = id }
-        every { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) } returns findBoard
+        every { mockBoardRepository.findByIdAndDeletedIsFalse(id) } returns findBoard
 
         //when then
         assertThatIllegalArgumentException().isThrownBy {
             boardService.updateBoard(id, BoardUpdateRequest(" ", "내용 수정").toEntity())
-            verify { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) }
+            verify { mockBoardRepository.findByIdAndDeletedIsFalse(id) }
         }
     }
 
@@ -130,12 +129,12 @@ class BoardServiceTest {
         //given
         val id = 1L
         val findBoard = Board.createOf("김태욱", "제목 테스트", "내용 테스트").apply { this.id = id }
-        every { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) } returns findBoard
+        every { mockBoardRepository.findByIdAndDeletedIsFalse(id) } returns findBoard
 
         //when then
         assertThatIllegalArgumentException().isThrownBy {
             boardService.updateBoard(id, BoardUpdateRequest("제목 수정", " ").toEntity())
-            verify { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) }
+            verify { mockBoardRepository.findByIdAndDeletedIsFalse(id) }
         }
     }
 
@@ -145,14 +144,14 @@ class BoardServiceTest {
         //given
         val id = 1L
         val findBoard = Board.createOf("김태욱", "제목 테스트", "내용 테스트").apply { this.id = id }
-        every { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) } returns findBoard
+        every { mockBoardRepository.findByIdAndDeletedIsFalse(id) } returns findBoard
 
         //when
         val deleted = boardService.deleteBoard(id).run { findBoard.deleted }
 
         //then
         assertThat(deleted).isTrue
-        verify { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) }
+        verify { mockBoardRepository.findByIdAndDeletedIsFalse(id) }
     }
 
     @DisplayName("없거나 삭제 된 게시물은 삭제할 수 없음")
@@ -160,12 +159,12 @@ class BoardServiceTest {
     fun `given not exists id when delete board then throw IllegalStateException`() {
         //given
         val id = 1L
-        every { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) } returns null
+        every { mockBoardRepository.findByIdAndDeletedIsFalse(id) } returns null
 
         //when then
         assertThatIllegalStateException().isThrownBy {
             boardService.deleteBoard(id)
-            verify { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) }
+            verify { mockBoardRepository.findByIdAndDeletedIsFalse(id) }
         }
     }
 }

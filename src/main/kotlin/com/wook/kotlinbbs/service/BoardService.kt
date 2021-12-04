@@ -9,7 +9,6 @@ import javax.transaction.Transactional
 @Transactional
 @Service
 class BoardService(private val boardRepository: BoardRepository) {
-
     fun addBoard(board: Board): Board {
         return boardRepository.save(board)
     }
