@@ -82,4 +82,16 @@ class BoardTest {
             }
             .withMessageContaining("내용")
     }
+
+    @Test
+    fun `given id when delete board then deleted`() {
+        //given
+        val board = Board.createOf("김태욱", "제목", "내용").apply { this.id = 1L }
+
+        //when
+        board.delete()
+
+        //then
+        assertThat(board.deleted).isTrue
+    }
 }

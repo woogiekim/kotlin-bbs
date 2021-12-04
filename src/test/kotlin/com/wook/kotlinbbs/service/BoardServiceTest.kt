@@ -84,8 +84,10 @@ class BoardServiceTest {
         every { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) } returns null
 
         //when then
-        assertThatIllegalStateException().isThrownBy { boardService.getBoard(id) }
-        verify { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) }
+        assertThatIllegalStateException().isThrownBy {
+            boardService.getBoard(id)
+            verify { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) }
+        }
     }
 
     @DisplayName("게시물 수정")
@@ -109,7 +111,7 @@ class BoardServiceTest {
 
     @DisplayName("게시물을 수정할 때 게시물 제목은 필수로 입력해야함")
     @Test
-    fun `given blank title when update board then IllegalArgumentException`() {
+    fun `given blank title when update board then throw IllegalArgumentException`() {
         //given
         val id = 1L
         val findBoard = Board.createOf("김태욱", "제목 테스트", "내용 테스트").apply { this.id = id }
@@ -124,7 +126,7 @@ class BoardServiceTest {
 
     @DisplayName("게시물을 수정할 때 게시물 내용은 필수로 입력해야함")
     @Test
-    fun `given blank content when update board then IllegalArgumentException`() {
+    fun `given blank content when update board then throw IllegalArgumentException`() {
         //given
         val id = 1L
         val findBoard = Board.createOf("김태욱", "제목 테스트", "내용 테스트").apply { this.id = id }
@@ -151,5 +153,19 @@ class BoardServiceTest {
         //then
         assertThat(deleted).isTrue
         verify { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) }
+    }
+
+    @DisplayName("없거나 삭제 된 게시물은 삭제할 수 없음")
+    @Test
+    fun `given not exists id when delete board then throw IllegalStateException`() {
+        //given
+        val id = 1L
+        every { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) } returns null
+
+        //when then
+        assertThatIllegalStateException().isThrownBy {
+            boardService.deleteBoard(id)
+            verify { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) }
+        }
     }
 }
