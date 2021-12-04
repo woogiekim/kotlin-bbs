@@ -9,5 +9,5 @@ import java.util.*
 interface BoardRepository : JpaRepository<Board, Long> {
     fun findAllByDeletedIsFalse(pageable: Pageable): Page<Board>
 
-    fun findByIdAndDeletedIsFalse(id: Long): Optional<Board>
+    fun findByIdAndDeletedIsFalse(id: Long): Board?
 }

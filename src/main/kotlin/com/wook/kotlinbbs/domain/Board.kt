@@ -5,10 +5,10 @@ import javax.persistence.Entity
 @Entity
 class Board private constructor(
     var title: String,
-    var content: String
-) : BaseEntity() {
-    var author: String? = null
+    var content: String,
+    var author: String? = null,
     var deleted: Boolean = false
+) : BaseEntity() {
 
     init {
         valid()

@@ -1,8 +1,8 @@
 package com.wook.kotlinbbs.presentation.dto
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import com.wook.kotlinbbs.domain.Board
-import com.wook.kotlinbbs.extension.dateFormatter
-import com.wook.kotlinbbs.extension.formatOrNull
+import java.time.LocalDateTime
 
 data class BoardCreateRequest(
     val author: String,
@@ -28,20 +28,22 @@ data class BoardResponse(
     val author: String,
     val title: String,
     val content: String,
-    val createAt: String?,
-    val updateAt: String?
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    val createAt: LocalDateTime?,
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    val updateAt: LocalDateTime?
 ) {
 
     companion object {
         fun fromEntity(board: Board): BoardResponse {
             return board.run {
                 BoardResponse(
-                    id!!,
-                    author!!,
+                    checkNotNull(id) { "게시물 아이디가 없습니다." },
+                    checkNotNull(author) { "게시물 작성자가 없습니다." },
                     title,
                     content,
-                    createAt formatOrNull dateFormatter,
-                    updateAt formatOrNull dateFormatter
+                    createAt,
+                    updateAt
                 )
             }
         }

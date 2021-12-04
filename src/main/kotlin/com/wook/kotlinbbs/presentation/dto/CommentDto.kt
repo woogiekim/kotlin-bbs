@@ -21,7 +21,11 @@ data class CommentResponse(
     companion object {
         fun fromEntity(comment: Comment): CommentResponse {
             return comment.run {
-                CommentResponse(id!!, author, content)
+                CommentResponse(
+                    checkNotNull(id) { "댓글 아이디가 없습니다." },
+                    author,
+                    content
+                )
             }
         }
     }
