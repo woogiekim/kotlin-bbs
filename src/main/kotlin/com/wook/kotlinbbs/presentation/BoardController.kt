@@ -1,8 +1,9 @@
 package com.wook.kotlinbbs.presentation
 
-import com.wook.kotlinbbs.presentation.dto.BoardRequest
+import com.wook.kotlinbbs.presentation.dto.BoardCreateRequest
 import com.wook.kotlinbbs.presentation.dto.BoardResponse
 import com.wook.kotlinbbs.presentation.dto.BoardResponses
+import com.wook.kotlinbbs.presentation.dto.BoardUpdateRequest
 import com.wook.kotlinbbs.service.BoardService
 import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
@@ -14,8 +15,8 @@ import java.net.URI
 class BoardController(private val boardService: BoardService) {
 
     @PostMapping
-    fun addBoard(@RequestBody boardRequest: BoardRequest): ResponseEntity<BoardResponse> {
-        val boardResponse = BoardResponse.fromEntity(boardService.addBoard(boardRequest.toEntity()))
+    fun addBoard(@RequestBody boardCreateRequest: BoardCreateRequest): ResponseEntity<BoardResponse> {
+        val boardResponse = BoardResponse.fromEntity(boardService.addBoard(boardCreateRequest.toEntity()))
 
         return ResponseEntity.created(URI.create("/boards/${boardResponse.id}")).body(boardResponse)
     }
@@ -28,5 +29,10 @@ class BoardController(private val boardService: BoardService) {
     @GetMapping("/{id}")
     fun getBoard(@PathVariable id: Long): BoardResponse {
         return BoardResponse.fromEntity(boardService.getBoard(id))
+    }
+
+    @PutMapping("/{id}")
+    fun updateBoard(@PathVariable id: Long, @RequestBody boardUpdateRequest: BoardUpdateRequest): BoardResponse {
+        return BoardResponse.fromEntity(boardService.updateBoard(id, boardUpdateRequest.toEntity()))
     }
 }

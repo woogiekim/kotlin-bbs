@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 class BoardTest {
 
     @Test
-    fun `작성자, 제목, 내용으로 게시글을 등록한다`() {
+    fun `given id, author, title and content when create Board then created`() {
         //given
         val id = 1L
         val author = "김태욱"
@@ -15,30 +15,71 @@ class BoardTest {
         val content = "내용 테스트"
 
         //when
-        val board = Board(author, title, content).apply { this.id = id }
+        val board = Board.createOf(author, title, content).apply { this.id = id }
 
         //then
-        assertThat(board).isEqualTo(Board(author, title, content).apply { this.id = id })
+        assertThat(board).isEqualTo(Board.createOf(author, title, content).apply { this.id = id })
     }
 
     @Test
-    fun `작성자가 없으면 예외가 발생한다`() {
+    fun `when author is blank then throw IllegalArgumentException`() {
         assertThatIllegalArgumentException()
-            .isThrownBy { Board(" ", "제목", "내용") }
+            .isThrownBy { Board.createOf(" ", "제목", "내용") }
             .withMessageContaining("작성자")
     }
 
     @Test
-    fun `제목이 없으면 예외가 발생한다`() {
+    fun `when title is blank then throw IllegalArgumentException`() {
         assertThatIllegalArgumentException()
-            .isThrownBy { Board("김태욱", " ", "내용") }
+            .isThrownBy { Board.createOf("김태욱", " ", "내용") }
             .withMessageContaining("제목")
     }
 
     @Test
-    fun `내용이 없으면 예외가 발생한다`() {
+    fun `when content is blank then throw IllegalArgumentException`() {
         assertThatIllegalArgumentException()
-            .isThrownBy { Board("김태욱", "제목", " ") }
+            .isThrownBy { Board.createOf("김태욱", "제목", " ") }
+            .withMessageContaining("내용")
+    }
+
+    @Test
+    fun `given title and content when change board then changed`() {
+        //given
+        //게시물 생성되어있음
+        val id = 1L
+        val author = "김태욱"
+        val board = Board.createOf(author, "제목", "내용").apply { this.id = id }
+
+        val changeTitle = "제목 수정"
+        val changeContent = "내용 수정"
+        val updateBoard = Board.updateOf(changeTitle, changeContent)
+
+        //when
+        val changedBoard = board.change(updateBoard)
+
+        //then
+        assertThat(changedBoard).isNotNull
+            .extracting(Board::id, Board::author, Board::title, Board::content)
+            .containsExactly(id, author, changeTitle, changeContent)
+    }
+
+    @Test
+    fun `given blank title when change board then throw IllegalArgumentException`() {
+        assertThatIllegalArgumentException()
+            .isThrownBy {
+                Board.createOf("김태욱", "제목", "내용")
+                    .change(Board.updateOf(" ", "내용 수정"))
+            }
+            .withMessageContaining("제목")
+    }
+
+    @Test
+    fun `given blank content when change board then throw IllegalArgumentException`() {
+        assertThatIllegalArgumentException()
+            .isThrownBy {
+                Board.createOf("김태욱", "제목", "내용")
+                    .change(Board.updateOf("제목 수정", " "))
+            }
             .withMessageContaining("내용")
     }
 }

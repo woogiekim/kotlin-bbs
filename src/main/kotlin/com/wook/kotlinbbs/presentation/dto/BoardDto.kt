@@ -4,13 +4,22 @@ import com.wook.kotlinbbs.domain.Board
 import com.wook.kotlinbbs.extension.dateFormatter
 import com.wook.kotlinbbs.extension.formatOrNull
 
-data class BoardRequest(
+data class BoardCreateRequest(
     val author: String,
     val title: String,
     val content: String
 ) {
     fun toEntity(): Board {
-        return Board(author, title, content)
+        return Board.createOf(author, title, content)
+    }
+}
+
+data class BoardUpdateRequest(
+    val title: String,
+    val content: String
+) {
+    fun toEntity(): Board {
+        return Board.updateOf(title, content)
     }
 }
 
@@ -28,11 +37,11 @@ data class BoardResponse(
             return board.run {
                 BoardResponse(
                     id!!,
-                    author,
+                    author!!,
                     title,
                     content,
-                    createAt.formatOrNull(dateFormatter),
-                    updateAt.formatOrNull(dateFormatter)
+                    createAt formatOrNull dateFormatter,
+                    updateAt formatOrNull dateFormatter
                 )
             }
         }
