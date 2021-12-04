@@ -8,6 +8,7 @@ class Board private constructor(
     var content: String
 ) : BaseEntity() {
     var author: String? = null
+    var deleted: Boolean = false
 
     init {
         valid()
@@ -34,6 +35,10 @@ class Board private constructor(
             this.title = board.title
             this.content = board.content
         }
+    }
+
+    fun delete() {
+        deleted = true
     }
 
     companion object {

@@ -1,9 +1,9 @@
 package com.wook.kotlinbbs.service
 
 import com.wook.kotlinbbs.domain.Board
+import com.wook.kotlinbbs.extension.findByIdAndDeletedIsFalseOrNull
 import com.wook.kotlinbbs.repository.BoardRepository
 import org.springframework.data.domain.Pageable
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
 
@@ -16,16 +16,18 @@ class BoardService(private val boardRepository: BoardRepository) {
     }
 
     fun getBoards(pageable: Pageable): List<Board> {
-        return boardRepository.findAll(pageable).content
+        return boardRepository.findAllByDeletedIsFalse(pageable).content
     }
 
     fun getBoard(id: Long): Board {
-        return boardRepository.findByIdOrNull(id) ?: throw IllegalStateException("삭제되었거나 없는 게시글입니다.")
+        return boardRepository.findByIdAndDeletedIsFalseOrNull(id) ?: throw IllegalStateException("삭제되었거나 없는 게시글입니다.")
     }
 
     fun updateBoard(id: Long, board: Board): Board {
-        val updateBoard = this.getBoard(id)
+        return this.getBoard(id).change(board)
+    }
 
-        return updateBoard.change(board)
+    fun deleteBoard(id: Long) {
+        this.getBoard(id).delete()
     }
 }

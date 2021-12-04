@@ -35,4 +35,11 @@ class BoardController(private val boardService: BoardService) {
     fun updateBoard(@PathVariable id: Long, @RequestBody boardUpdateRequest: BoardUpdateRequest): BoardResponse {
         return BoardResponse.fromEntity(boardService.updateBoard(id, boardUpdateRequest.toEntity()))
     }
+
+    @DeleteMapping("/{id}")
+    fun deleteBoard(@PathVariable id: Long): ResponseEntity<Any> {
+        boardService.deleteBoard(id)
+
+        return ResponseEntity.noContent().location(URI.create("/boards")).build()
+    }
 }

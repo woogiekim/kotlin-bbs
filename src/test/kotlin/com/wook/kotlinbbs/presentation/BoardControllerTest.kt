@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.wook.kotlinbbs.presentation.dto.BoardCreateRequest
 import com.wook.kotlinbbs.presentation.dto.BoardResponse
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -46,7 +47,7 @@ class BoardControllerTest @Autowired constructor(
         //given
         //게시물 등록 되어 있음
         for (index in 1..10) {
-            `게시물 등록 및 검증`(BoardCreateRequest("wook $index", "title $index", "content $index"), mockMvc)
+            `게시물 등록 및 검증`(BoardCreateRequest("김태욱 $index", "제목 $index", "내용 $index"), mockMvc)
         }
 
         //when
@@ -63,7 +64,7 @@ class BoardControllerTest @Autowired constructor(
     fun getBoard() {
         //given
         //게시물 등록 되어 있음
-        val boardResponse = `게시물 등록 및 검증`(BoardCreateRequest("wook", "title", "content"), mockMvc)
+        val boardResponse = `게시물 등록 및 검증`(BoardCreateRequest("김태욱", "제목", "내용"), mockMvc)
 
         //when
         //게시물 조회
@@ -91,11 +92,27 @@ class BoardControllerTest @Autowired constructor(
         `게시물 수정됨`(boardResponse, boardRequest, resultActionsDsl)
     }
 
+    @Test
+    fun deleteBoard() {
+        //given
+        //게시물 등록되어 있음
+        val boardResponse = `게시물 등록 및 검증`(BoardCreateRequest("김태욱", "제목", "내용"), mockMvc)
+        val boardRequest = BoardCreateRequest("김태욱", "제목 수정", "내용 수정")
+
+        //when
+        //게시물 삭제
+        `게시물 삭제`(boardResponse, mockMvc)
+
+        //then
+        //게시물 삭제됨
+        `게시물 삭제됨`(boardResponse.id, mockMvc)
+    }
+
     companion object {
         fun `게시물 등록`(boardCreateRequest: BoardCreateRequest, mockMvc: MockMvc): ResultActionsDsl {
             return mockMvc
                 .post("/boards") {
-                    contentType = MediaType.APPLICATION_JSON
+                    contentType = MediaType.APPLICATION_JSON_UTF8
                     content = jacksonObjectMapper().writeValueAsString(boardCreateRequest)
                 }
                 .andExpect {
@@ -160,7 +177,7 @@ class BoardControllerTest @Autowired constructor(
         ): ResultActionsDsl {
             return mockMvc
                 .put("/boards/{id}", boardResponse.id) {
-                    contentType = MediaType.APPLICATION_JSON
+                    contentType = MediaType.APPLICATION_JSON_UTF8
                     content = jacksonObjectMapper().writeValueAsString(boardRequest)
                 }
                 .andExpect { status().isOk }
@@ -177,6 +194,14 @@ class BoardControllerTest @Autowired constructor(
                 jsonPath("$.createAt", equals(boardResponse.createAt))
                 jsonPath("$.updateAt", !equals(boardResponse.updateAt))
             }
+        }
+
+        fun `게시물 삭제`(boardResponse: BoardResponse, mockMvc: MockMvc) {
+            mockMvc.delete("/boards/{id}", boardResponse.id).andExpect { status().isNoContent }
+        }
+
+        fun `게시물 삭제됨`(id: Long, mockMvc: MockMvc) {
+            assertThatThrownBy { `게시물 조회`(id, mockMvc) }.hasCauseInstanceOf(IllegalStateException::class.java)
         }
     }
 }

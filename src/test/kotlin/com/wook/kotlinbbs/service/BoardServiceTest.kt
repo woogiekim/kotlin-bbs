@@ -1,6 +1,7 @@
 package com.wook.kotlinbbs.service
 
 import com.wook.kotlinbbs.domain.Board
+import com.wook.kotlinbbs.extension.findByIdAndDeletedIsFalseOrNull
 import com.wook.kotlinbbs.presentation.dto.BoardUpdateRequest
 import com.wook.kotlinbbs.repository.BoardRepository
 import io.mockk.every
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.repository.findByIdOrNull
 import java.util.stream.LongStream
 import kotlin.streams.toList
 
@@ -50,14 +50,14 @@ class BoardServiceTest {
         val givenBoards = LongStream.range(1, 10)
             .mapToObj { Board.createOf("김태욱 $it", "제목 테스트 $it", "내용 테스트 $it").apply { this.id = it } }
             .toList()
-        every { mockBoardRepository.findAll(pageRequest) } returns PageImpl(givenBoards)
+        every { mockBoardRepository.findAllByDeletedIsFalse(pageRequest) } returns PageImpl(givenBoards)
 
         //when
         val boards = boardService.getBoards(pageRequest)
 
         //then
         assertThat(boards).isNotEmpty.isEqualTo(givenBoards)
-        verify { mockBoardRepository.findAll(pageRequest) }
+        verify { mockBoardRepository.findAllByDeletedIsFalse(pageRequest) }
     }
 
     @DisplayName("게시물 조회")
@@ -66,14 +66,14 @@ class BoardServiceTest {
         //given
         val id = 1L
         val givenBoard = Board.createOf("김태욱", "제목 테스트", "내용 테스트").apply { this.id = id }
-        every { mockBoardRepository.findByIdOrNull(id) } returns givenBoard
+        every { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) } returns givenBoard
 
         //when
         val actualBoard = boardService.getBoard(id)
 
         //then
         assertThat(actualBoard).isNotNull.isEqualTo(givenBoard)
-        verify { mockBoardRepository.findByIdOrNull(id) }
+        verify { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) }
     }
 
     @DisplayName("게시물을 찾을 수 없음")
@@ -81,11 +81,11 @@ class BoardServiceTest {
     fun notFoundBoard() {
         //given
         val id = 1L
-        every { mockBoardRepository.findByIdOrNull(id) } returns null
+        every { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) } returns null
 
         //when then
         assertThatIllegalStateException().isThrownBy { boardService.getBoard(id) }
-        verify { mockBoardRepository.findByIdOrNull(id) }
+        verify { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) }
     }
 
     @DisplayName("게시물 수정")
@@ -94,7 +94,7 @@ class BoardServiceTest {
         //given
         val id = 1L
         val findBoard = Board.createOf("김태욱", "제목 테스트", "내용 테스트").apply { this.id = id }
-        every { mockBoardRepository.findByIdOrNull(id) } returns findBoard
+        every { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) } returns findBoard
 
         val givenBoard = BoardUpdateRequest("제목 수정", "내용 수정").toEntity()
 
@@ -113,12 +113,12 @@ class BoardServiceTest {
         //given
         val id = 1L
         val findBoard = Board.createOf("김태욱", "제목 테스트", "내용 테스트").apply { this.id = id }
-        every { mockBoardRepository.findByIdOrNull(id) } returns findBoard
+        every { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) } returns findBoard
 
         //when then
         assertThatIllegalArgumentException().isThrownBy {
             boardService.updateBoard(id, BoardUpdateRequest(" ", "내용 수정").toEntity())
-            verify { mockBoardRepository.findByIdOrNull(id) }
+            verify { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) }
         }
     }
 
@@ -128,12 +128,28 @@ class BoardServiceTest {
         //given
         val id = 1L
         val findBoard = Board.createOf("김태욱", "제목 테스트", "내용 테스트").apply { this.id = id }
-        every { mockBoardRepository.findByIdOrNull(id) } returns findBoard
+        every { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) } returns findBoard
 
         //when then
         assertThatIllegalArgumentException().isThrownBy {
             boardService.updateBoard(id, BoardUpdateRequest("제목 수정", " ").toEntity())
-            verify { mockBoardRepository.findByIdOrNull(id) }
+            verify { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) }
         }
+    }
+
+    @DisplayName("게시물 삭제")
+    @Test
+    fun deleteBoard() {
+        //given
+        val id = 1L
+        val findBoard = Board.createOf("김태욱", "제목 테스트", "내용 테스트").apply { this.id = id }
+        every { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) } returns findBoard
+
+        //when
+        val deleted = boardService.deleteBoard(id).run { findBoard.deleted }
+
+        //then
+        assertThat(deleted).isTrue
+        verify { mockBoardRepository.findByIdAndDeletedIsFalseOrNull(id) }
     }
 }
