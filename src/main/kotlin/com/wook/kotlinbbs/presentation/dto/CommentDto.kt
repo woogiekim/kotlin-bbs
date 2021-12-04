@@ -1,13 +1,14 @@
 package com.wook.kotlinbbs.presentation.dto
 
+import com.wook.kotlinbbs.domain.Board
 import com.wook.kotlinbbs.domain.Comment
 
 data class CommentCreateRequest(
     val author: String,
     val content: String
 ) {
-    fun toEntity(): Comment {
-        return Comment(author, content)
+    fun toEntityWith(board: Board): Comment {
+        return Comment.createOf(author, content, board)
     }
 }
 

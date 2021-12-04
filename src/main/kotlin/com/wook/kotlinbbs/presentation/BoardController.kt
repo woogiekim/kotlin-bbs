@@ -47,7 +47,7 @@ class BoardController(
     @PostMapping("/{id}/comments")
     fun addComment(@PathVariable id: Long, @RequestBody commentCreateRequest: CommentCreateRequest): CommentResponse {
         return CommentResponse.fromEntity(
-            commentService.addComment(boardService.getBoard(id), commentCreateRequest.toEntity())
+            commentService.addComment(commentCreateRequest.toEntityWith(boardService.getBoard(id)))
         )
     }
 }

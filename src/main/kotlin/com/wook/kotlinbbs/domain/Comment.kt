@@ -4,16 +4,18 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "board_comment")
-class Comment(
+class Comment private constructor(
     val author: String,
     var content: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(foreignKey = ForeignKey(name = "fk_comment_to_board"))
-    var board: Board? = null
+    val board: Board
 ) : BaseEntity() {
 
-    fun withBoard(board: Board): Comment {
-        return this.apply { this.board = board }
+    companion object {
+        fun createOf(author: String, content: String, board: Board): Comment {
+            return Comment(author, content, board)
+        }
     }
 }
