@@ -15,6 +15,14 @@ data class CommentCreateRequest(
     }
 }
 
+data class CommentUpdateRequest(
+    val content: String
+) {
+    fun toEntityWith(board: Board): Comment {
+        return Comment.updateOf(content, board)
+    }
+}
+
 data class CommentResponse(
     val id: Long,
     val author: String,
@@ -29,7 +37,7 @@ data class CommentResponse(
             return comment.run {
                 CommentResponse(
                     checkNotNull(id) { "댓글 아이디가 없습니다." },
-                    author,
+                    checkNotNull(author) { "댓글 작성자가 없습니다." },
                     content,
                     createAt,
                     updateAt

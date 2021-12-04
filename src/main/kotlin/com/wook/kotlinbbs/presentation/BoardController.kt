@@ -44,19 +44,30 @@ class BoardController(
         return ResponseEntity.noContent().location(URI.create("/boards")).build()
     }
 
-    @PostMapping("/{id}/comments")
+    @PostMapping("/{boardId}/comments")
     fun addComment(
-        @PathVariable id: Long,
+        @PathVariable boardId: Long,
         @RequestBody commentCreateRequest: CommentCreateRequest
     ): ResponseEntity<CommentResponse> {
         val commentResponse = CommentResponse.fromEntity(
-            commentService.addComment(commentCreateRequest.toEntityWith(boardService.getBoard(id)))
+            commentService.addComment(commentCreateRequest.toEntityWith(boardService.getBoard(boardId)))
         )
-        return ResponseEntity.created(URI.create("/boards/$id/comments")).body(commentResponse)
+        return ResponseEntity.created(URI.create("/boards/$boardId/comments")).body(commentResponse)
     }
 
-    @GetMapping("/{id}/comments")
-    fun getComments(@PathVariable id: Long): CommentResponses {
-        return CommentResponses.fromEntity(commentService.getComments(id))
+    @GetMapping("/{boardId}/comments")
+    fun getComments(@PathVariable boardId: Long): CommentResponses {
+        return CommentResponses.fromEntity(commentService.getComments(boardId))
+    }
+
+    @PutMapping("/{boardId}/comments/{id}")
+    fun updateComment(
+        @PathVariable boardId: Long,
+        @PathVariable id: Long,
+        @RequestBody commentUpdateRequest: CommentUpdateRequest
+    ): CommentResponse {
+        return CommentResponse.fromEntity(
+            commentService.updateComment(id, commentUpdateRequest.toEntityWith(boardService.getBoard(boardId)))
+        )
     }
 }

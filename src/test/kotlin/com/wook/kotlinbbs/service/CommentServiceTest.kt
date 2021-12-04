@@ -12,6 +12,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.data.repository.findByIdOrNull
 import java.util.stream.LongStream
 import kotlin.streams.toList
 
@@ -57,5 +58,26 @@ class CommentServiceTest {
         //then
         assertThat(findAllComments).isNotEmpty.isEqualTo(comments)
         verify { board.id?.let { mockCommentRepository.findAllByBoardId(it) } }
+    }
+
+    @DisplayName("댓글 수정")
+    @Test
+    fun updateComment() {
+        //given
+        val id = 1L
+        val board = Board.createOf("김태욱", "제목", "내용").apply { this.id = 1L }
+        val findComment = Comment.createOf("김태욱", "내용", board).apply { this.id = 1L }
+        every { mockCommentRepository.findByIdOrNull(id) } returns findComment
+
+        val givenComment = Comment.updateOf("내용 수정", board)
+
+        //when
+        val updateComment = commentService.updateComment(id, givenComment)
+
+        //then
+        assertThat(updateComment).isNotNull
+            .extracting(Comment::content)
+            .isEqualTo(givenComment.content)
+        verify { mockCommentRepository.findByIdOrNull(id) }
     }
 }

@@ -3,10 +3,7 @@ package com.wook.kotlinbbs.presentation
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.wook.kotlinbbs.presentation.BoardAcceptanceTest.Companion.`게시물 등록 및 검증`
-import com.wook.kotlinbbs.presentation.dto.BoardCreateRequest
-import com.wook.kotlinbbs.presentation.dto.BoardResponse
-import com.wook.kotlinbbs.presentation.dto.CommentCreateRequest
-import com.wook.kotlinbbs.presentation.dto.CommentResponse
+import com.wook.kotlinbbs.presentation.dto.*
 import org.hamcrest.Matchers.`is`
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -15,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.ResultActionsDsl
-import org.springframework.test.web.servlet.get
-import org.springframework.test.web.servlet.post
+import org.springframework.test.web.servlet.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @DisplayName("댓글 API 테스트")
@@ -71,17 +65,36 @@ class CommentAcceptanceTest @Autowired constructor(
         `댓글 목록 조회됨`(resultActionsDsl)
     }
 
+    @DisplayName("댓글 수정")
+    @Test
+    internal fun updateComment() {
+        //given
+        //댓글 등록 되어있음
+        val commentResponse = `댓글 등록 및 검증`(boardResponse.id, CommentCreateRequest("김태욱", "댓글 내용입니다."), mockMvc)
+
+        //댓글 수정 요청
+        val commentUpdateRequest = CommentUpdateRequest("댓글 내용 수정입니다.")
+
+        //when
+        //댓글 수정
+        val resultActionsDsl = `댓글 수정`(boardResponse.id, commentResponse.id, commentUpdateRequest, mockMvc)
+
+        //then
+        //댓글 수정됨
+        `댓글 수정됨`(commentUpdateRequest, resultActionsDsl)
+    }
+
     companion object {
-        fun `댓글 등록`(id: Long, commentCreateRequest: CommentCreateRequest, mockMvc: MockMvc): ResultActionsDsl {
+        fun `댓글 등록`(boardId: Long, commentCreateRequest: CommentCreateRequest, mockMvc: MockMvc): ResultActionsDsl {
             return mockMvc
-                .post("/boards/{id}/comments", id) {
+                .post("/boards/{boardId}/comments", boardId) {
                     contentType = MediaType.APPLICATION_JSON_UTF8
                     content = jacksonObjectMapper().writeValueAsString(commentCreateRequest)
                 }
         }
 
-        fun `댓글 등록 및 검증`(id: Long, commentCreateRequest: CommentCreateRequest, mockMvc: MockMvc): CommentResponse {
-            val resultActionsDsl = `댓글 등록`(id, commentCreateRequest, mockMvc)
+        fun `댓글 등록 및 검증`(boardId: Long, commentCreateRequest: CommentCreateRequest, mockMvc: MockMvc): CommentResponse {
+            val resultActionsDsl = `댓글 등록`(boardId, commentCreateRequest, mockMvc)
 
             `댓글 등록 됨`(commentCreateRequest, resultActionsDsl)
 
@@ -98,8 +111,8 @@ class CommentAcceptanceTest @Autowired constructor(
             }
         }
 
-        private fun `댓글 목록 조회`(id: Long, mockMvc: MockMvc): ResultActionsDsl {
-            return mockMvc.get("/boards/{id}/comments", id)
+        fun `댓글 목록 조회`(boardId: Long, mockMvc: MockMvc): ResultActionsDsl {
+            return mockMvc.get("/boards/{boardId}/comments", boardId)
         }
 
         fun `댓글 목록 조회됨`(resultActionsDsl: ResultActionsDsl) {
@@ -108,6 +121,25 @@ class CommentAcceptanceTest @Autowired constructor(
                 jsonPath("$.commentResponses.*.id") { exists() }
                 jsonPath("$.commentResponses.*.author") { exists() }
                 jsonPath("$.commentResponses.*.content") { exists() }
+            }
+        }
+
+        fun `댓글 수정`(
+            boardId: Long,
+            id: Long,
+            commentUpdateRequest: CommentUpdateRequest,
+            mockMvc: MockMvc
+        ): ResultActionsDsl {
+            return mockMvc.put("/boards/{boardId}/comments/{id}", boardId, id) {
+                contentType = MediaType.APPLICATION_JSON_UTF8
+                content = commentUpdateRequest
+            }
+        }
+
+        fun `댓글 수정됨`(commentUpdateRequest: CommentUpdateRequest, resultActionsDsl: ResultActionsDsl) {
+            resultActionsDsl.andExpect {
+                status().isOk
+                jsonPath("$.content") { `is`(commentUpdateRequest.content) }
             }
         }
     }
