@@ -15,22 +15,19 @@ import org.springframework.test.web.servlet.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-
 @DisplayName("게시판 API 테스트")
 @SpringBootTest
 @AutoConfigureMockMvc
-class BoardControllerTest @Autowired constructor(
-    private val mockMvc: MockMvc,
+class BoardAcceptanceTest @Autowired constructor(
+    private val mockMvc: MockMvc
 ) {
 
     @DisplayName("게시물 등록")
     @Test
     fun addBoard() {
         //given
-        val author = "김태욱"
-        val title = "제목 테스트"
-        val content = "내용 테스트"
-        val boardCreateRequest = BoardCreateRequest(author, title, content)
+        //게시물 등록 요청
+        val boardCreateRequest = BoardCreateRequest("김태욱", "제목 테스트", "내용 테스트")
 
         //when
         //게시물 등록

@@ -8,7 +8,12 @@ class Comment(
     val author: String,
     var content: String,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.REMOVE])
     @JoinColumn(foreignKey = ForeignKey(name = "fk_comment_to_board"))
-    val board: Board
-) : BaseEntity()
+    var board: Board? = null
+) : BaseEntity() {
+
+    fun withBoard(board: Board): Comment {
+        return this.apply { this.board = board }
+    }
+}

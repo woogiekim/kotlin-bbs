@@ -1,10 +1,8 @@
 package com.wook.kotlinbbs.presentation
 
-import com.wook.kotlinbbs.presentation.dto.BoardCreateRequest
-import com.wook.kotlinbbs.presentation.dto.BoardResponse
-import com.wook.kotlinbbs.presentation.dto.BoardResponses
-import com.wook.kotlinbbs.presentation.dto.BoardUpdateRequest
+import com.wook.kotlinbbs.presentation.dto.*
 import com.wook.kotlinbbs.service.BoardService
+import com.wook.kotlinbbs.service.CommentService
 import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -12,7 +10,10 @@ import java.net.URI
 
 @RestController
 @RequestMapping("/boards")
-class BoardController(private val boardService: BoardService) {
+class BoardController(
+    private val boardService: BoardService,
+    private val commentService: CommentService
+) {
 
     @PostMapping
     fun addBoard(@RequestBody boardCreateRequest: BoardCreateRequest): ResponseEntity<BoardResponse> {
@@ -41,5 +42,12 @@ class BoardController(private val boardService: BoardService) {
         boardService.deleteBoard(id)
 
         return ResponseEntity.noContent().location(URI.create("/boards")).build()
+    }
+
+    @PostMapping("/{id}/comments")
+    fun addComment(@PathVariable id: Long, @RequestBody commentCreateRequest: CommentCreateRequest): CommentResponse {
+        return CommentResponse.fromEntity(
+            commentService.addComment(boardService.getBoard(id), commentCreateRequest.toEntity())
+        )
     }
 }
