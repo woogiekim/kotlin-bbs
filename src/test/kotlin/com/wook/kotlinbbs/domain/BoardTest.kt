@@ -5,7 +5,6 @@ import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import org.junit.jupiter.api.Test
 
 class BoardTest {
-
     @Test
     fun `given id, author, title and content when create Board then created`() {
         //given

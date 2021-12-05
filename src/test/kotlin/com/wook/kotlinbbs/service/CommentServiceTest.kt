@@ -18,7 +18,6 @@ import kotlin.streams.toList
 @DisplayName("댓글 서비스 테스트")
 @ExtendWith(MockKExtension::class)
 class CommentServiceTest {
-
     @MockK
     private lateinit var mockCommentRepository: CommentRepository
 

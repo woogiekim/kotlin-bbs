@@ -23,7 +23,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 class CommentAcceptanceTest @Autowired constructor(
     private val mockMvc: MockMvc
 ) {
-
     private lateinit var boardResponse: BoardResponse
 
     @BeforeEach

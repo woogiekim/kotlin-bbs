@@ -20,7 +20,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 class BoardAcceptanceTest @Autowired constructor(
     private val mockMvc: MockMvc
 ) {
-
     @DisplayName("게시물 등록")
     @Test
     fun addBoard() {
