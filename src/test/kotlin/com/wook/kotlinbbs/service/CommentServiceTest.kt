@@ -50,14 +50,14 @@ class CommentServiceTest {
         val comments = LongStream.range(1, 10)
             .mapToObj { Comment.createOf("김태욱", "내용", board).apply { this.id = it } }
             .toList()
-        every { board.id?.let { mockCommentRepository.findAllByBoardId(it) } } returns comments
+        every { board.id?.let { mockCommentRepository.findAllByBoardIdAndDeletedIsFalse(it) } } returns comments
 
         //when
         val findAllComments = board.id?.let { commentService.getComments(it) }
 
         //then
         assertThat(findAllComments).isNotEmpty.isEqualTo(comments)
-        verify { board.id?.let { mockCommentRepository.findAllByBoardId(it) } }
+        verify { board.id?.let { mockCommentRepository.findAllByBoardIdAndDeletedIsFalse(it) } }
     }
 
     @DisplayName("댓글 수정")
@@ -79,5 +79,22 @@ class CommentServiceTest {
             .extracting(Comment::content)
             .isEqualTo(givenComment.content)
         verify { mockCommentRepository.findByIdOrNull(id) }
+    }
+
+    @DisplayName("댓글 삭제")
+    @Test
+    fun deleteComment() {
+        //given
+        val id = 1L
+        val board = Board.createOf("김태욱", "제목 테스트", "내용 테스트").apply { this.id = id }
+        val findComment = Comment.createOf("김태욱", "댓글 내용", board).apply { this.id = id }
+        every { mockCommentRepository.findByIdAndDeletedIsFalse(id) } returns findComment
+
+        //when
+        val deleted = commentService.deleteComment(id).run { findComment.deleted }
+
+        //then
+        assertThat(deleted).isTrue
+        verify { mockCommentRepository.findByIdAndDeletedIsFalse(id) }
     }
 }

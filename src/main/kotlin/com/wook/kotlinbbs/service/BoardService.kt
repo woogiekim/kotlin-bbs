@@ -22,10 +22,10 @@ class BoardService(private val boardRepository: BoardRepository) {
     }
 
     fun updateBoard(id: Long, board: Board): Board {
-        return this.getBoard(id).change(board)
+        return getBoard(id).change(board)
     }
 
     fun deleteBoard(id: Long) {
-        this.getBoard(id).delete()
+        getBoard(id).delete()
     }
 }

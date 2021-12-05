@@ -4,6 +4,8 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.wook.kotlinbbs.presentation.BoardAcceptanceTest.Companion.`게시물 등록 및 검증`
 import com.wook.kotlinbbs.presentation.dto.*
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.groups.Tuple
 import org.hamcrest.Matchers.`is`
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -84,6 +86,20 @@ class CommentAcceptanceTest @Autowired constructor(
         `댓글 수정됨`(commentUpdateRequest, resultActionsDsl)
     }
 
+    @DisplayName("댓글 삭제")
+    @Test
+    fun deleteComment() {
+        //given
+        //댓글 등록 되어있음
+        val commentResponse = `댓글 등록 및 검증`(boardResponse.id, CommentCreateRequest("김태욱", "댓글 내용입니다."), mockMvc)
+
+        //댓글 삭제
+        val resultActionsDsl = `댓글 삭제`(boardResponse.id, commentResponse.id, mockMvc)
+
+        //댓글 삭제됨
+        `댓글 삭제됨`(boardResponse.id, commentResponse.id, resultActionsDsl, mockMvc)
+    }
+
     companion object {
         fun `댓글 등록`(boardId: Long, commentCreateRequest: CommentCreateRequest, mockMvc: MockMvc): ResultActionsDsl {
             return mockMvc
@@ -112,7 +128,7 @@ class CommentAcceptanceTest @Autowired constructor(
         }
 
         fun `댓글 목록 조회`(boardId: Long, mockMvc: MockMvc): ResultActionsDsl {
-            return mockMvc.get("/boards/{boardId}/comments", boardId)
+            return mockMvc.get("/boards/{boardId}/comments", boardId) { accept = MediaType.APPLICATION_JSON_UTF8 }
         }
 
         fun `댓글 목록 조회됨`(resultActionsDsl: ResultActionsDsl) {
@@ -141,6 +157,23 @@ class CommentAcceptanceTest @Autowired constructor(
                 status().isOk
                 jsonPath("$.content") { `is`(commentUpdateRequest.content) }
             }
+        }
+
+        fun `댓글 삭제`(boardId: Long, id: Long, mockMvc: MockMvc): ResultActionsDsl {
+            return mockMvc.delete("/boards/{boardId}/comments/{id}", boardId, id)
+        }
+
+        fun `댓글 삭제됨`(boardId: Long, id: Long, resultActionsDsl: ResultActionsDsl, mockMvc: MockMvc) {
+            resultActionsDsl.andExpect { status().isNoContent }
+            val commentResponses = jacksonObjectMapper().readValue(
+                `댓글 목록 조회`(boardId, mockMvc)
+                    .andExpect { status().isOk }
+                    .andReturn().response.contentAsString,
+                CommentResponses::class.java
+            )
+            assertThat(commentResponses.commentResponses)
+                .extracting(CommentResponse::id)
+                .doesNotContain(Tuple(id))
         }
     }
 }

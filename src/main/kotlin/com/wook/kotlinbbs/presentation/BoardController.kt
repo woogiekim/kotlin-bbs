@@ -70,4 +70,11 @@ class BoardController(
             commentService.updateComment(id, commentUpdateRequest.toEntityWith(boardService.getBoard(boardId)))
         )
     }
+
+    @DeleteMapping("/comments/{id}")
+    fun deleteComment(@PathVariable id: Long): ResponseEntity<Any> {
+        commentService.deleteComment(id)
+
+        return ResponseEntity.noContent().build()
+    }
 }
