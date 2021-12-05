@@ -8,9 +8,9 @@ class Comment private constructor(
     var content: String,
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(foreignKey = ForeignKey(name = "fk_comment_to_board"))
-    val board: Board,
+    var board: Board? = null,
     var author: String? = null,
-    var deleted: Boolean = true
+    var deleted: Boolean = false
 ) : BaseEntity() {
     init {
         valid()
@@ -26,7 +26,6 @@ class Comment private constructor(
 
     fun change(comment: Comment): Comment {
         return apply {
-            require(this.board == comment.board) { "다른 게시물의 댓글입니다." }
             this.content = comment.content
         }
     }
@@ -41,8 +40,8 @@ class Comment private constructor(
             return Comment(content, board, author)
         }
 
-        fun updateOf(content: String, board: Board): Comment {
-            return Comment(content, board)
+        fun updateOf(content: String): Comment {
+            return Comment(content)
         }
     }
 }

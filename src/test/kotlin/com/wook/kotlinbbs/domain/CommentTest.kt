@@ -45,7 +45,7 @@ class CommentTest {
     fun `given content when update comment then updated`() {
         //given
         val originalComment = Comment.createOf("김태욱", "댓글 내용", board).apply { this.id = 1L }
-        val givenComment = Comment.updateOf("수정", board)
+        val givenComment = Comment.updateOf("수정")
 
         //when
         val updateComment = originalComment.change(givenComment)
@@ -58,7 +58,7 @@ class CommentTest {
 
     @Test
     fun `given blank content when update comment then throw IllegalArgumentException`() {
-        assertThatIllegalArgumentException().isThrownBy { Comment.updateOf(" ", board) }
+        assertThatIllegalArgumentException().isThrownBy { Comment.updateOf(" ") }
     }
 
     @Test

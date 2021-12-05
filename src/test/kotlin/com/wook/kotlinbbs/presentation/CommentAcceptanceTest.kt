@@ -79,7 +79,7 @@ class CommentAcceptanceTest @Autowired constructor(
 
         //when
         //댓글 수정
-        val resultActionsDsl = `댓글 수정`(boardResponse.id, commentResponse.id, commentUpdateRequest, mockMvc)
+        val resultActionsDsl = `댓글 수정`(commentResponse.id, commentUpdateRequest, mockMvc)
 
         //then
         //댓글 수정됨
@@ -94,7 +94,7 @@ class CommentAcceptanceTest @Autowired constructor(
         val commentResponse = `댓글 등록 및 검증`(boardResponse.id, CommentCreateRequest("김태욱", "댓글 내용입니다."), mockMvc)
 
         //댓글 삭제
-        val resultActionsDsl = `댓글 삭제`(boardResponse.id, commentResponse.id, mockMvc)
+        val resultActionsDsl = `댓글 삭제`(commentResponse.id, mockMvc)
 
         //댓글 삭제됨
         `댓글 삭제됨`(boardResponse.id, commentResponse.id, resultActionsDsl, mockMvc)
@@ -140,13 +140,8 @@ class CommentAcceptanceTest @Autowired constructor(
             }
         }
 
-        fun `댓글 수정`(
-            boardId: Long,
-            id: Long,
-            commentUpdateRequest: CommentUpdateRequest,
-            mockMvc: MockMvc
-        ): ResultActionsDsl {
-            return mockMvc.put("/boards/{boardId}/comments/{id}", boardId, id) {
+        fun `댓글 수정`(id: Long, commentUpdateRequest: CommentUpdateRequest, mockMvc: MockMvc): ResultActionsDsl {
+            return mockMvc.put("/boards/comments/{id}", id) {
                 contentType = MediaType.APPLICATION_JSON_UTF8
                 content = commentUpdateRequest
             }
@@ -159,8 +154,8 @@ class CommentAcceptanceTest @Autowired constructor(
             }
         }
 
-        fun `댓글 삭제`(boardId: Long, id: Long, mockMvc: MockMvc): ResultActionsDsl {
-            return mockMvc.delete("/boards/{boardId}/comments/{id}", boardId, id)
+        fun `댓글 삭제`(id: Long, mockMvc: MockMvc): ResultActionsDsl {
+            return mockMvc.delete("/boards/comments/{id}", id)
         }
 
         fun `댓글 삭제됨`(boardId: Long, id: Long, resultActionsDsl: ResultActionsDsl, mockMvc: MockMvc) {

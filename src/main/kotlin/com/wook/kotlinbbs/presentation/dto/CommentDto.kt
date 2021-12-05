@@ -18,8 +18,8 @@ data class CommentCreateRequest(
 data class CommentUpdateRequest(
     val content: String
 ) {
-    fun toEntityWith(board: Board): Comment {
-        return Comment.updateOf(content, board)
+    fun toEntityWith(): Comment {
+        return Comment.updateOf(content)
     }
 }
 

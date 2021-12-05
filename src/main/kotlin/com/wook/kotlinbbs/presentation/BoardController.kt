@@ -60,15 +60,12 @@ class BoardController(
         return CommentResponses.fromEntity(commentService.getComments(boardId))
     }
 
-    @PutMapping("/{boardId}/comments/{id}")
+    @PutMapping("/comments/{id}")
     fun updateComment(
-        @PathVariable boardId: Long,
         @PathVariable id: Long,
         @RequestBody commentUpdateRequest: CommentUpdateRequest
     ): CommentResponse {
-        return CommentResponse.fromEntity(
-            commentService.updateComment(id, commentUpdateRequest.toEntityWith(boardService.getBoard(boardId)))
-        )
+        return CommentResponse.fromEntity(commentService.updateComment(id, commentUpdateRequest.toEntityWith()))
     }
 
     @DeleteMapping("/comments/{id}")
