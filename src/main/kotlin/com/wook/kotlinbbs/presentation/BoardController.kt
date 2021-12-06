@@ -1,8 +1,10 @@
 package com.wook.kotlinbbs.presentation
 
-import com.wook.kotlinbbs.presentation.dto.*
+import com.wook.kotlinbbs.presentation.dto.BoardCreateRequest
+import com.wook.kotlinbbs.presentation.dto.BoardResponse
+import com.wook.kotlinbbs.presentation.dto.BoardResponses
+import com.wook.kotlinbbs.presentation.dto.BoardUpdateRequest
 import com.wook.kotlinbbs.service.BoardService
-import com.wook.kotlinbbs.service.CommentService
 import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -10,11 +12,7 @@ import java.net.URI
 
 @RestController
 @RequestMapping("/boards")
-class BoardController(
-    private val boardService: BoardService,
-    private val commentService: CommentService
-) {
-
+class BoardController(private val boardService: BoardService) {
     @PostMapping
     fun addBoard(@RequestBody boardCreateRequest: BoardCreateRequest): ResponseEntity<BoardResponse> {
         val boardResponse = BoardResponse.fromEntity(boardService.addBoard(boardCreateRequest.toEntity()))
@@ -42,36 +40,5 @@ class BoardController(
         boardService.deleteBoard(id)
 
         return ResponseEntity.noContent().location(URI.create("/boards")).build()
-    }
-
-    @PostMapping("/{boardId}/comments")
-    fun addComment(
-        @PathVariable boardId: Long,
-        @RequestBody commentCreateRequest: CommentCreateRequest
-    ): ResponseEntity<CommentResponse> {
-        val commentResponse = CommentResponse.fromEntity(
-            commentService.addComment(commentCreateRequest.toEntityWith(boardService.getBoard(boardId)))
-        )
-        return ResponseEntity.created(URI.create("/boards/$boardId/comments")).body(commentResponse)
-    }
-
-    @GetMapping("/{boardId}/comments")
-    fun getComments(@PathVariable boardId: Long): CommentResponses {
-        return CommentResponses.fromEntity(commentService.getComments(boardId))
-    }
-
-    @PutMapping("/comments/{id}")
-    fun updateComment(
-        @PathVariable id: Long,
-        @RequestBody commentUpdateRequest: CommentUpdateRequest
-    ): CommentResponse {
-        return CommentResponse.fromEntity(commentService.updateComment(id, commentUpdateRequest.toEntityWith()))
-    }
-
-    @DeleteMapping("/comments/{id}")
-    fun deleteComment(@PathVariable id: Long): ResponseEntity<Any> {
-        commentService.deleteComment(id)
-
-        return ResponseEntity.noContent().build()
     }
 }
