@@ -108,6 +108,7 @@ class BoardAcceptanceTest @Autowired constructor(
             return mockMvc
                 .post("/boards") {
                     contentType = MediaType.APPLICATION_JSON_UTF8
+                    accept = MediaType.APPLICATION_JSON_UTF8
                     content = jacksonObjectMapper().writeValueAsString(boardCreateRequest)
                 }
         }
