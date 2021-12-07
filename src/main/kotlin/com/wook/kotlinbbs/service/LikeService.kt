@@ -11,4 +11,12 @@ class LikeService(private val likeRepository: LikeRepository) {
     fun like(like: Like): Like {
         return likeRepository.save(like)
     }
+
+    fun getLikes(boardId: Long): List<Like> {
+        return likeRepository.findAllByBoardId(boardId)
+    }
+
+    fun unlike(id: Long) {
+        likeRepository.deleteById(id)
+    }
 }
